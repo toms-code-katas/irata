@@ -1,1 +1,4 @@
-# irata
+# IRATA
+You might wonder what `IRATA` means. Its the name of the famous arcade & computer game builder [Atari](https://en.wikipedia.org/wiki/Atari,_Inc.). And it was used by the creators of the likewise famous computer game [M.U.L.E.](https://en.wikipedia.org/wiki/M.U.L.E.) as the name of the planet to colonize.\
+The obvious next question is what does that have to do with this repository ? As I am a fan ot the game `M.U.L.E.` is choose to _reprogram_ the game as part of my [Code katas](https://github.com/toms-code-katas). Where the focus is not so much on making a `1:1` copy but rather to explore different programming languages and create a whole system.\
+If you would like to follow the progress on that journey, I invite you to reading my [blog](https://tom1299.github.io/retro-blog/). There is a special category `I.R.A.T.A`. that contains the blog post.
