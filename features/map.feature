@@ -12,7 +12,7 @@ Scenario: Default map creation
     | 5  | 5 |
 
 Scenario: Customized map creation
-  When I start creating a customized map
+  When I create a customized map
   Then the maps size is 10 x 3
   And the store is located at 1,1
   And plots of type "river" are located at:
@@ -31,7 +31,7 @@ Scenario: Customized map creation
     | 2  | 3 |
 
 Scenario: Customized map creation without mandatory store
-  When I start creating a customized map
+  When I create a customized map
   Then the maps size is 9 x 5
   And I finish map creation
   Then the error "No store location given" should occur

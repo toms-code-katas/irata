@@ -1,7 +1,7 @@
 Feature: Land grants let players choose a plot from the map
 
 Scenario: Land grant general process
-  Given I start creating a customized map
+  Given I create a customized map
   And the maps size is 3 x 3
   And the store is located at 2,2
   And I finish map creation
