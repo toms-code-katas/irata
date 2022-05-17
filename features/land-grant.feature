@@ -1,9 +1,7 @@
 Feature: Land grants let players choose a plot from the map
 
 Scenario: Land grant general process
-  Given I create a customized map
-  And the maps size is 3 x 3
-  And the store is located at 2,2
+  Given I create a default map
   And I finish map creation
   When I start the land grant
   Then the state of the land grant should be "ongoing"
