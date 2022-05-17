@@ -14,8 +14,9 @@ class Coordinates:
 
 class PlotType(Enum):
     STORE = 1
-    RIVER = 1
-    MOUNTAIN = 1
+    RIVER = 2
+    MOUNTAIN = 3
+    PLAINS = 3
 
 
 class Plot:
@@ -39,6 +40,9 @@ class Map:
             for y in range(self.height):
                 coordinates = Coordinates(x + 1, y + 1)
                 self.__plots[coordinates] = Plot(coordinates)
+
+    def get_plots(self):
+        return self.__plots.values()
 
 
 class LandGrant:

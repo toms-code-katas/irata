@@ -34,8 +34,9 @@ def map_size_is(context, is_or_should: str, x: int, y: int):
     :param is_or_should: Whether the size is or should be
     :type context: behave.runner.Context
     """
-    assert context.map.width == 9
-    assert context.map.height == 5
+    assert context.map.width == int(x)
+    assert context.map.height == int(y)
+    assert len(context.map.get_plots()) == int(x) * int(y)
 
 
 @step('the store (is|should be) located at (\\d+),(\\d+)')
