@@ -4,12 +4,12 @@ Scenario: Default map creation
   When I create a default map
   Then the maps size should be 9 x 5
   And the store should be located at 4,3
-  And plots of type "river" should be located at:
-    | x  | y |
-    | 5  | 1 |
-    | 5  | 2 |
-    | 5  | 4 |
-    | 5  | 5 |
+  And the map contains the following plots:
+    | x  | y | type  |
+    | 5  | 1 | type  |
+    | 5  | 2 | type  |
+    | 5  | 4 | type  |
+    | 5  | 5 | type  |
 
 Scenario: Customized map creation
   When I create a customized map
@@ -26,7 +26,7 @@ Scenario: Customized map creation
   And the store should be located at 1,1
   And the map contains the following plots:
     | x  | y | type  |
-    | 2  | 1 | river |
+    | 2  | 1 | type  |
     | 2  | 2 | river |
     | 2  | 3 | river |
 

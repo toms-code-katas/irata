@@ -1,4 +1,5 @@
 from behave import step, use_step_matcher
+from irata.model import Map
 
 use_step_matcher("re")
 
@@ -9,9 +10,12 @@ def create_a_map(context, map_type):
     :type context: behave.runner.Context
     :param map_type: The type of the map
     """
-    print(map_type)
-    # raise NotImplementedError(f'STEP: Given I create a {map_type} map')
-    pass
+    if map_type == "default":
+        mapp = Map()
+        mapp.create()
+        context.map = mapp
+    else:
+        raise NotImplementedError(f'STEP: I create a (default|customized) map')
 
 
 @step('I finish map creation')
@@ -19,7 +23,7 @@ def finish_map_creation(context):
     """
     :type context: behave.runner.Context
     """
-    pass
+    assert context.map is not None
 
 
 @step('the maps size (is|should be) (\\d+) x (\\d+)')
@@ -30,8 +34,8 @@ def map_size_is(context, is_or_should: str, x: int, y: int):
     :param is_or_should: Whether the size is or should be
     :type context: behave.runner.Context
     """
-    # raise NotImplementedError(f'STEP: the maps size is {x} x {y}')
-    pass
+    assert context.map.width == 9
+    assert context.map.height == 5
 
 
 @step('the store (is|should be) located at (\\d+),(\\d+)')
