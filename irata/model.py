@@ -1,4 +1,5 @@
 from enum import Enum
+from irata import utils
 
 
 class Player:
@@ -8,8 +9,8 @@ class Player:
 class Coordinates:
 
     def __init__(self, x, y):
-        self.__x = x
-        self.__y = y
+        self.x = x
+        self.y = y
 
 
 class PlotType(Enum):
@@ -22,9 +23,9 @@ class PlotType(Enum):
 class Plot:
 
     def __init__(self, coordinates: Coordinates, owner: Player = None, plot_type: PlotType = None):
-        self.__coordinates = coordinates
-        self.__plot_type = plot_type
-        self.__owner = owner
+        self.coordinates = coordinates
+        self.plot_type = plot_type
+        self.owner = owner
 
 
 class Map:
@@ -39,7 +40,8 @@ class Map:
         for x in range(self.width):
             for y in range(self.height):
                 coordinates = Coordinates(x + 1, y + 1)
-                self.__plots[coordinates] = Plot(coordinates)
+                p = Plot(coordinates=coordinates)
+                self.__plots[coordinates] = p
 
     def get_plots(self):
         return self.__plots.values()
@@ -50,4 +52,3 @@ class LandGrant:
 
     def __int__(self, mapp: Map):
         self.__map = mapp
-
