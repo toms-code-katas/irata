@@ -164,7 +164,7 @@
       "x": 5,
       "y": 1
     },
-    "plot_type": null,
+    "plot_type": "river",
     "owner": null
   },
   {
@@ -172,7 +172,7 @@
       "x": 5,
       "y": 2
     },
-    "plot_type": null,
+    "plot_type": "river",
     "owner": null
   },
   {
@@ -180,7 +180,7 @@
       "x": 5,
       "y": 3
     },
-    "plot_type": null,
+    "plot_type": "store",
     "owner": null
   },
   {
@@ -188,7 +188,7 @@
       "x": 5,
       "y": 4
     },
-    "plot_type": null,
+    "plot_type": "river",
     "owner": null
   },
   {
@@ -196,7 +196,7 @@
       "x": 5,
       "y": 5
     },
-    "plot_type": null,
+    "plot_type": "river",
     "owner": null
   },
   {

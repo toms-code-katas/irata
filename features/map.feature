@@ -3,13 +3,13 @@ Feature: Creation of maps based on various parameters like store location or riv
 Scenario: Default map creation
   When I create a default map
   Then the maps size should be 9 x 5
-  And the store should be located at 4,3
   And the map contains the following plots:
     | x  | y | type  |
-    | 5  | 1 | type  |
-    | 5  | 2 | type  |
-    | 5  | 4 | type  |
-    | 5  | 5 | type  |
+    | 5  | 1 | river |
+    | 5  | 2 | river |
+    | 5  | 3 | store |
+    | 5  | 4 | river |
+    | 5  | 5 | river |
 
 Scenario: Customized map creation
   When I create a customized map
@@ -17,15 +17,16 @@ Scenario: Customized map creation
   And the store is located at 1,1
   And the map contains the following plots:
     | x  | y | type  |
+    | 1  | 1 | store |
     | 2  | 1 | river |
     | 2  | 2 | river |
     | 2  | 3 | river |
   And plots of type mountain are randomly distributed
   And I finish map creation
   Then the maps size should be 10 x 3
-  And the store should be located at 1,1
   And the map contains the following plots:
     | x  | y | type  |
+    | 1  | 1 | store |
     | 2  | 1 | type  |
     | 2  | 2 | river |
     | 2  | 3 | river |

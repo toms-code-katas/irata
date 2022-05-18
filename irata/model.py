@@ -8,7 +8,10 @@ def to_plot(json_values):
     if "x" in json_values and "y" in json_values:
         return Coordinates(int(json_values["x"]), int(json_values["y"]))
     elif "coordinates" in json_values:
-        return Plot(coordinates=json_values["coordinates"])
+        plot_type = None
+        if json_values["plot_type"]:
+            plot_type = PlotType(json_values["plot_type"])
+        return Plot(coordinates=json_values["coordinates"], plot_type=plot_type)
     else:
         raise NotImplementedError(f"Could not deserialized dict {json_values} to any type")
 
@@ -42,10 +45,13 @@ class Coordinates:
 
 
 class PlotType(Enum):
-    STORE = 1
-    RIVER = 2
-    MOUNTAIN = 3
-    PLAINS = 3
+    def __str__(self):
+        return str(self.value)
+
+    STORE = "store"
+    RIVER = "river"
+    MOUNTAIN = "mountain"
+    PLAINS = "plains"
 
 
 class Plot:
@@ -58,11 +64,10 @@ class Plot:
 
 class Map:
 
-    __plots = {}
-
     def __init__(self, width: int = -1, height: int = -1):
         self.width = width
         self.height = height
+        self.plots = {}
 
     def create(self):
         if self.is_default_map():
@@ -73,8 +78,8 @@ class Map:
     def create_default_map(self):
         list_of_plots = load_map("default")
         for plot in list_of_plots:
-            self.__plots[plot.coordinates] = plot
-        last_plot = list(self.__plots.keys())[-1]
+            self.plots[plot.coordinates] = plot
+        last_plot = list(self.plots.keys())[-1]
         self.width = last_plot.x
         self.height = last_plot.y
 
@@ -83,17 +88,39 @@ class Map:
             for y in range(self.height):
                 coordinates = Coordinates(x + 1, y + 1)
                 p = Plot(coordinates=coordinates)
-                self.__plots[coordinates] = p
+                self.plots[coordinates] = p
 
     def get_plots(self):
-        return self.__plots.values()
+        return self.plots.values()
 
     def is_default_map(self):
         return self.width == -1 and self.height == -1
 
+    def get_plot_at(self, x, y):
+        return list(filter(lambda plot: plot.coordinates.x == x and plot.coordinates.y == y, self.plots.values()))[0]
+
+
+class LandGrantState(Enum):
+    CREATED = "created"
+    ONGOING = "ongoing"
+    FINISHED = "finished"
+
 
 class LandGrant:
-    __map: Map
 
-    def __int__(self, mapp: Map):
+    def __init__(self, mapp: Map):
+        self.state: LandGrantState = LandGrantState.CREATED
         self.__map = mapp
+        self.current_plot_index = 0
+
+    def advance(self):
+        self.current_plot_index += 1
+        if self.current_plot_index == len(self.__map.get_plots()):
+            self.state = LandGrantState.FINISHED
+
+    def get_state(self) -> LandGrantState:
+        return self.state
+
+    def start(self):
+        self.state = LandGrantState.ONGOING
+        self.advance()

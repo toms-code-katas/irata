@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map
+from irata.model import Map, PlotType
 
 use_step_matcher("re")
 
@@ -34,21 +34,10 @@ def map_size_is(context, is_or_should: str, x: int, y: int):
     :param is_or_should: Whether the size is or should be
     :type context: behave.runner.Context
     """
-    assert context.map.width == int(x)
-    assert context.map.height == int(y)
+    mapp = context.map
+    assert mapp.width == int(x)
+    assert mapp.height == int(y)
     assert len(context.map.get_plots()) == int(x) * int(y)
-
-
-@step('the store (is|should be) located at (\\d+),(\\d+)')
-def store_is_located_at(context, is_or_should: str, x: int, y: int):
-    """
-    :param is_or_should: Whether the store is or should be located
-    :param y: The y size
-    :param x: The x size
-    :type context: behave.runner.Context
-    """
-    # raise NotImplementedError(f'STEP: the store is located at {x} x {y}')
-    pass
 
 
 @step('the map contains the following plots')
@@ -56,7 +45,13 @@ def map_contains_plots(context):
     """
     :type context: behave.runner.Context
     """
-    pass
+    for row in context.table:
+        x = int(row["x"])
+        y = int(row["y"])
+        plot_type = (row["type"])
+        plot = context.map.get_plot_at(x, y)
+        assert plot
+        assert str(plot.plot_type) == plot_type
 
 
 @step('plots of type (mountain|river) are randomly distributed')
