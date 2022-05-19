@@ -75,6 +75,7 @@ class Map:
             self.create_default_map()
         else:
             self.create_custom_map()
+        self.validate_map()
 
     def create_default_map(self):
         list_of_plots = load_map("default")
@@ -97,6 +98,10 @@ class Map:
             return PlotType.MOUNTAIN
         else:
             return PlotType.PLAINS
+
+    def validate_map(self):
+        if not list(filter(lambda plot: plot.plot_type == PlotType.STORE, self.plots.values())):
+            raise Exception("No store on map")
 
     def get_plots(self):
         return self.plots.values()

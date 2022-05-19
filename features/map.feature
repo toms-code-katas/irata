@@ -35,4 +35,4 @@ Scenario: Customized map creation without mandatory store
   When I create a customized map
   Then the maps size is 9 x 5
   And I finish map creation
-  Then the error "No store location given" should occur
+  Then the error "No store on map" should occur

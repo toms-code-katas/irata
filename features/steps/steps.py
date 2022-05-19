@@ -21,7 +21,10 @@ def finish_map_creation(context):
     """
     assert context.map is not None
     mapp = context.map
-    mapp.create()
+    try:
+        mapp.create()
+    except Exception as e:
+        context.exception = e
 
 
 @step('the maps size (is|should be) (\\d+) x (\\d+)')
@@ -73,12 +76,15 @@ def randomly_distributed_plots(context, plot_type: str):
 
     assert mountains > 0
 
+
 @step('the error "(.*)" should occur')
 def error_should_occur(context, error: str):
     """
     :param error: The error
     :type context: behave.runner.Context
     """
-    pass
+    exception: Exception = context.exception
+    assert exception
+    assert str(exception) == error
 
 
