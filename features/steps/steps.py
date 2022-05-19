@@ -60,14 +60,18 @@ def map_contains_plots(context, contains_or_shoud_contain):
             plot.plot_type = PlotType(plot_type)
 
 
-@step('plots of type (mountain|river) are randomly distributed')
+@step('plots of type (mountain|river) should be randomly distributed')
 def randomly_distributed_plots(context, plot_type: str):
     """
     :param plot_type: The type of the plot
     :type context: behave.runner.Context
     """
-    pass
+    mountains = 0
+    for plot in context.map.get_plots():
+        if plot.plot_type == PlotType.MOUNTAIN:
+            mountains += 1
 
+    assert mountains > 0
 
 @step('the error "(.*)" should occur')
 def error_should_occur(context, error: str):

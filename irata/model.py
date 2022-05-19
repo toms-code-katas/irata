@@ -1,6 +1,7 @@
 from enum import Enum
 import json
 import os
+import random
 
 
 def to_plot(json_values):
@@ -87,8 +88,15 @@ class Map:
         for x in range(self.width):
             for y in range(self.height):
                 coordinates = Coordinates(x + 1, y + 1)
-                p = Plot(coordinates=coordinates)
+                p = Plot(coordinates=coordinates, plot_type=self.create_plot_type())
                 self.plots[coordinates] = p
+
+    def create_plot_type(self):
+        should_be_mountain = bool(random.getrandbits(1))
+        if should_be_mountain:
+            return PlotType.MOUNTAIN
+        else:
+            return PlotType.PLAINS
 
     def get_plots(self):
         return self.plots.values()

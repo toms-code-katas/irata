@@ -22,7 +22,6 @@ Scenario: Customized map creation
     | 2  | 1 | river |
     | 2  | 2 | river |
     | 2  | 3 | river |
-  And plots of type mountain are randomly distributed
   Then the maps size should be 10 x 3
   And the map should contain the following plots:
     | x  | y | type  |
@@ -30,6 +29,7 @@ Scenario: Customized map creation
     | 2  | 1 | river |
     | 2  | 2 | river |
     | 2  | 3 | river |
+  And plots of type mountain should be randomly distributed
 
 Scenario: Customized map creation without mandatory store
   When I create a customized map
