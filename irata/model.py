@@ -123,17 +123,18 @@ class LandGrant:
 
     def __init__(self, mapp: Map):
         self.state: LandGrantState = LandGrantState.CREATED
-        self.__map = mapp
+        self.map = mapp
         self.current_plot_index = 0
 
     def advance(self):
+        if self.state == LandGrantState.FINISHED:
+            raise Exception("Land grant finished")
         self.current_plot_index += 1
-        if self.current_plot_index == len(self.__map.get_plots()):
+        if self.current_plot_index == len(self.map.get_plots()):
             self.state = LandGrantState.FINISHED
-
-    def get_state(self) -> LandGrantState:
-        return self.state
 
     def start(self):
         self.state = LandGrantState.ONGOING
-        self.advance()
+
+    def get_current_plot(self):
+        return list(self.map.plots.values())[self.current_plot_index]

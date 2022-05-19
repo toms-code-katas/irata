@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType
+from irata.model import Map, PlotType, Plot, LandGrant
 
 use_step_matcher("re")
 
@@ -12,6 +12,23 @@ def create_a_map(context, map_type):
     """
     mapp = Map()
     context.map = mapp
+
+
+@step('I create a land grant with the current map')
+def create_a_land_grant(context):
+    """
+    :type context: behave.runner.Context
+    """
+    land_grant = LandGrant(mapp=context.map)
+    context.land_grant = land_grant
+
+
+@step('I start the land grant')
+def create_a_land_grant(context):
+    """
+    :type context: behave.runner.Context
+    """
+    context.land_grant.start()
 
 
 @step('I finish map creation')
@@ -46,8 +63,9 @@ def map_size_is(context, is_or_should: str, x: int, y: int):
 
 
 @step('the map (contains|should contain) the following plots')
-def map_contains_plots(context, contains_or_shoud_contain):
+def map_contains_plots(context, contains_or_should_contain):
     """
+    :param contains_or_should_contain: Should or contains
     :type context: behave.runner.Context
     """
     mapp = context.map
@@ -56,7 +74,7 @@ def map_contains_plots(context, contains_or_shoud_contain):
         y = int(row["y"])
         plot_type = (row["type"])
         plot = mapp.get_plot_at(x, y)
-        if contains_or_shoud_contain == "should contain":
+        if contains_or_should_contain == "should contain":
             assert plot
             assert str(plot.plot_type) == plot_type
         else:
@@ -86,5 +104,39 @@ def error_should_occur(context, error: str):
     exception: Exception = context.exception
     assert exception
     assert str(exception) == error
+
+
+@step('the state of the land grant should be (ongoing|finished)')
+def state_of_land_grant_should_be(context, expected_state: str):
+    """
+    :param expected_state: The expected state
+    :type context: behave.runner.Context
+    """
+    str(context.land_grant.state) == expected_state
+
+
+@step('the current plot should contain the following attributes')
+def state_of_current_plot(context):
+    plot: Plot = context.land_grant.get_current_plot()
+    for row in context.table:
+        x = int(row["x"])
+        y = int(row["y"])
+        plot_type = (row["type"])
+        assert plot.coordinates.x == x
+        assert plot.coordinates.y == y
+        assert plot.plot_type == PlotType(plot_type)
+
+
+@step('I advance the land grant (\\d+) times*?')
+def advance_land_grant(context, times: str):
+    for i in range(0, int(times)):
+        try:
+            context.land_grant.advance()
+        except Exception as e:
+            context.exception = e
+
+
+
+
 
 
