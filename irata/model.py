@@ -64,9 +64,9 @@ class Plot:
 
 class Map:
 
-    def __init__(self, width: int = -1, height: int = -1):
-        self.width = width
-        self.height = height
+    def __init__(self):
+        self.width = -1
+        self.height = -1
         self.plots = {}
 
     def create(self):

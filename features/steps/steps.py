@@ -10,12 +10,8 @@ def create_a_map(context, map_type):
     :type context: behave.runner.Context
     :param map_type: The type of the map
     """
-    if map_type == "default":
-        mapp = Map()
-        mapp.create()
-        context.map = mapp
-    else:
-        raise NotImplementedError(f'STEP: I create a (default|customized) map')
+    mapp = Map()
+    context.map = mapp
 
 
 @step('I finish map creation')
@@ -24,6 +20,8 @@ def finish_map_creation(context):
     :type context: behave.runner.Context
     """
     assert context.map is not None
+    mapp = context.map
+    mapp.create()
 
 
 @step('the maps size (is|should be) (\\d+) x (\\d+)')
@@ -35,27 +33,35 @@ def map_size_is(context, is_or_should: str, x: int, y: int):
     :type context: behave.runner.Context
     """
     mapp = context.map
-    assert mapp.width == int(x)
-    assert mapp.height == int(y)
-    assert len(context.map.get_plots()) == int(x) * int(y)
+    if is_or_should == "is":
+        mapp.width = int(x)
+        mapp.height = int(y)
+    elif is_or_should == "should be":
+        assert mapp.width == int(x)
+        assert mapp.height == int(y)
+        assert len(context.map.get_plots()) == int(x) * int(y)
 
 
-@step('the map contains the following plots')
-def map_contains_plots(context):
+@step('the map (contains|should contain) the following plots')
+def map_contains_plots(context, contains_or_shoud_contain):
     """
     :type context: behave.runner.Context
     """
+    mapp = context.map
     for row in context.table:
         x = int(row["x"])
         y = int(row["y"])
         plot_type = (row["type"])
-        plot = context.map.get_plot_at(x, y)
-        assert plot
-        assert str(plot.plot_type) == plot_type
+        plot = mapp.get_plot_at(x, y)
+        if contains_or_shoud_contain == "should contain":
+            assert plot
+            assert str(plot.plot_type) == plot_type
+        else:
+            plot.plot_type = PlotType(plot_type)
 
 
 @step('plots of type (mountain|river) are randomly distributed')
-def map_contains_plots(context, plot_type: str):
+def randomly_distributed_plots(context, plot_type: str):
     """
     :param plot_type: The type of the plot
     :type context: behave.runner.Context
