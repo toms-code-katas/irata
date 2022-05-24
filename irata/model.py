@@ -34,8 +34,18 @@ def load_map(name: str = "default"):
         return json.loads(map_file.read(), object_hook=to_plot)
 
 
-class Player:
+class PlayerType:
     pass
+
+    def __init__(self, name: str):
+        self.name = name
+
+
+class Player:
+
+    def __init__(self, name: str, player_type: PlayerType):
+        self.name = name
+        self.type = player_type
 
 
 class Coordinates:
@@ -121,8 +131,9 @@ class LandGrantState(Enum):
 
 class LandGrant:
 
-    def __init__(self, mapp: Map):
+    def __init__(self, mapp: Map, players: {} = None):
         self.state: LandGrantState = LandGrantState.CREATED
+        self.players = players
         self.map = mapp
         self.current_plot_index = 0
 

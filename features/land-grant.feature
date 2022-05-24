@@ -25,3 +25,13 @@ Scenario: Land grant general process
   Then the state of the land grant should be finished
   When I advance the land grant 1 time
   Then the error "Land grant finished" should occur
+
+Scenario: Land grant plot selection
+  Given I create a default map
+  And I finish map creation
+  And I create the following players:
+    | name     | type    |
+    | Player A | Flapper |
+    | Player B | Packer  |
+  And I create a land grant with the current map and players
+  When I start the land grant

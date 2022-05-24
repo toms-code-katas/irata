@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType, Plot, LandGrant
+from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType
 
 use_step_matcher("re")
 
@@ -14,12 +14,16 @@ def create_a_map(context, map_type):
     context.map = mapp
 
 
-@step('I create a land grant with the current map')
-def create_a_land_grant(context):
+@step('I create a land grant with the current map(| and players)')
+def create_a_land_grant(context, with_players:str):
     """
     :type context: behave.runner.Context
+    :param with_players: players should be included in the land grant
     """
     land_grant = LandGrant(mapp=context.map)
+    if with_players:
+        land_grant.players = context.players
+
     context.land_grant = land_grant
 
 
@@ -112,7 +116,8 @@ def state_of_land_grant_should_be(context, expected_state: str):
     :param expected_state: The expected state
     :type context: behave.runner.Context
     """
-    str(context.land_grant.state) == expected_state
+    land_grant_state = context.land_grant.state.value
+    assert land_grant_state == expected_state
 
 
 @step('the current plot should contain the following attributes')
@@ -136,7 +141,10 @@ def advance_land_grant(context, times: str):
             context.exception = e
 
 
-
-
-
-
+@step('I create the following players')
+def create_players(context):
+    context.players = {}
+    for row in context.table:
+        name = row["name"]
+        player_type = row["type"]
+        context.players[name] = Player(name=name, player_type=PlayerType(player_type))
