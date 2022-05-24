@@ -80,7 +80,7 @@ def map_contains_plots(context, contains_or_should_contain):
         plot = mapp.get_plot_at(x, y)
         if contains_or_should_contain == "should contain":
             assert plot
-            assert str(plot.plot_type) == plot_type
+            assert plot.plot_type.value == plot_type
         else:
             plot.plot_type = PlotType(plot_type)
 
@@ -129,7 +129,7 @@ def state_of_current_plot(context):
         plot_type = (row["type"])
         assert plot.coordinates.x == x
         assert plot.coordinates.y == y
-        assert plot.plot_type == PlotType(plot_type)
+        assert plot.plot_type.value == plot_type
 
 
 @step('I advance the land grant (\\d+) times*?')

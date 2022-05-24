@@ -56,9 +56,6 @@ class Coordinates:
 
 
 class PlotType(Enum):
-    def __str__(self):
-        return str(self.value)
-
     STORE = "store"
     RIVER = "river"
     MOUNTAIN = "mountain"
