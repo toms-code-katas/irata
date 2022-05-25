@@ -31,7 +31,25 @@ Scenario: Land grant plot selection
   And I finish map creation
   And I create the following players:
     | name     | type    |
-    | Player A | Flapper |
-    | Player B | Packer  |
+    | A        | Flapper |
+    | B        | Packer  |
   And I create a land grant with the current map and players
   When I start the land grant
+  And player A selects the plot
+  Then the current plot should contain the following attributes:
+    | x | y | type   | state  | owner  |
+    | 1 | 1 |        | taken  | A      |
+  When I advance the land grant 22 times
+  And player A selects the plot
+  Then the current plot should contain the following attributes:
+    | x | y | type  | state  | owner  |
+    | 5 | 3 | store | taken  | system |
+  When I advance the land grant 1 time
+  And player A selects the plot
+  Then the current plot should contain the following attributes:
+    | x | y | type  | state  | owner  |
+    | 6 | 3 |       | free   |        |
+  When player B selects the plot
+  Then the current plot should contain the following attributes:
+    | x | y | type  | state  | owner  |
+    | 6 | 3 |       | taken  | B      |

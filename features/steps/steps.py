@@ -126,10 +126,17 @@ def state_of_current_plot(context):
     for row in context.table:
         x = int(row["x"])
         y = int(row["y"])
-        plot_type = (row["type"])
+        plot_type = row["type"]
+        state = row["state"]
+        owner = row["owner"]
         assert plot.coordinates.x == x
         assert plot.coordinates.y == y
-        assert plot.plot_type.value == plot_type
+        if plot_type:
+            assert plot.plot_type.value == plot_type
+        if state:
+            assert plot.state.value == state
+        if owner:
+            assert plot.owner == owner
 
 
 @step('I advance the land grant (\\d+) times*?')
@@ -148,3 +155,8 @@ def create_players(context):
         name = row["name"]
         player_type = row["type"]
         context.players[name] = Player(name=name, player_type=PlayerType(player_type))
+
+
+@step('player (\\w+) selects the plot')
+def player_selects_plot(context, player_name):
+    context.land_grant.select_current_plot(context.players[player_name])

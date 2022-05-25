@@ -181,7 +181,8 @@
       "y": 3
     },
     "plot_type": "store",
-    "owner": null
+    "owner": "system",
+    "state": "taken"
   },
   {
     "coordinates": {

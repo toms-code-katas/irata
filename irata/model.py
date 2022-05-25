@@ -9,10 +9,16 @@ def to_plot(json_values):
     if "x" in json_values and "y" in json_values:
         return Coordinates(int(json_values["x"]), int(json_values["y"]))
     elif "coordinates" in json_values:
-        plot_type = None
-        if json_values["plot_type"]:
+        plot_type = PlotType.PLAINS
+        if "plot_type" in json_values and json_values["plot_type"]:
             plot_type = PlotType(json_values["plot_type"])
-        return Plot(coordinates=json_values["coordinates"], plot_type=plot_type)
+        plot_state = PlotState.FREE
+        if "state" in json_values and json_values["state"]:
+            plot_state = PlotState(json_values["state"])
+        owner = None
+        if "owner" in json_values and json_values["owner"]:
+            owner = json_values["owner"]
+        return Plot(coordinates=json_values["coordinates"], plot_type=plot_type, plot_sate=plot_state, owner=owner)
     else:
         raise NotImplementedError(f"Could not deserialized dict {json_values} to any type")
 
@@ -62,12 +68,18 @@ class PlotType(Enum):
     PLAINS = "plains"
 
 
+class PlotState(Enum):
+    FREE = "free"
+    TAKEN = "taken"
+
+
 class Plot:
 
-    def __init__(self, coordinates: Coordinates, owner: Player = None, plot_type: PlotType = None):
+    def __init__(self, coordinates: Coordinates, owner: Player = None, plot_type: PlotType = None, plot_sate: PlotState = PlotState.FREE):
         self.coordinates = coordinates
         self.plot_type = plot_type
         self.owner = owner
+        self.state = plot_sate
 
 
 class Map:
@@ -133,6 +145,7 @@ class LandGrant:
         self.players = players
         self.map = mapp
         self.current_plot_index = 0
+        self.players_already_selected = {}
 
     def advance(self):
         if self.state == LandGrantState.FINISHED:
@@ -146,3 +159,14 @@ class LandGrant:
 
     def get_current_plot(self):
         return list(self.map.plots.values())[self.current_plot_index]
+
+    def select_current_plot(self, player: Player) -> bool:
+        if player.name in self.players_already_selected.keys():
+            return False
+        current_plot: Plot = self.get_current_plot()
+        if current_plot.state == PlotState.TAKEN:
+            return False
+        current_plot.owner = player.name
+        current_plot.state = PlotState.TAKEN
+        self.players_already_selected[player.name] = player
+        return True
