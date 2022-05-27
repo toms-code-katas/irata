@@ -41,7 +41,6 @@ def load_map(name: str = "default"):
 
 
 class PlayerType:
-    pass
 
     def __init__(self, name: str):
         self.name = name
