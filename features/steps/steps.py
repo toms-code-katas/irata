@@ -160,3 +160,19 @@ def create_players(context):
 @step('player (\\w+) selects the plot')
 def player_selects_plot(context, player_name):
     context.land_grant.select_current_plot(context.players[player_name])
+
+
+@step('the players have the following state for (food|energy|smithore|crystite)')
+def player_state_for_resource(context, resource: str):
+    for row in context.table:
+        pass
+
+
+@step('I calculate the spoilage of (food|energy|smithore|crystite) for player (\\w+)')
+def player_state_for_resource(context, resource: str, player: str):
+    pass
+
+
+@step('player (\\w+) should have spoiled (\\d+) unit(?:s)? of (food|energy|smithore|crystite)')
+def player_state_for_resource(context, player: str, units: str, resource: str):
+    pass
