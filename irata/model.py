@@ -54,13 +54,20 @@ class ResourceState:
         self.name = name
         self.inventory: int = 0
         self.consumed_in_last_turn: int = 0
+        self.produced_in_last_turn: int = 0
         self.spoilage: int = 0
+        self.surplus: int = 0
 
     def calculate_spoilage(self):
         if self.name in ["food", "energy"]:
-            self.spoilage = math.floor((self.inventory - self.consumed_in_last_turn) / 2)
+            self.spoilage = math.ceil((self.inventory - self.consumed_in_last_turn) / 2)
         elif self.name in ["smithore", "crystite"] and self.inventory > 50:
             self.spoilage = self.inventory - 50
+
+    def calculate_surplus(self, units_needed: int):
+        if self.name in ["food", "energy"]:
+            available_units = self.inventory - self.spoilage - self.consumed_in_last_turn + self.produced_in_last_turn
+            self.surplus = available_units - units_needed
 
 
 class Player:
@@ -75,6 +82,10 @@ class Player:
         if resource_state:
             resource_state.calculate_spoilage()
 
+    def calculate_surplus(self, resource_name: str, units_needed: int):
+        resource_state = self.resource_states[resource_name]
+        if resource_state:
+            resource_state.calculate_surplus(units_needed)
 
 class Coordinates:
 

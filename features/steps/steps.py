@@ -168,17 +168,52 @@ def player_state_for_resource(context, resource: str):
         player = context.players[row["name"]]
         resource_state = ResourceState(resource)
         resource_state.inventory = int(row["inventory"])
-        resource_state.consumed_in_last_turn = int(row["consumed in last turn"])
+        if "consumed in last turn" in row.headings:
+            resource_state.consumed_in_last_turn = int(row["consumed in last turn"])
+        if "produced in last turn" in row.headings:
+            resource_state.produced_in_last_turn = int(row["produced in last turn"])
         player.resource_states[resource] = resource_state
 
 
 @step('I calculate the spoilage of (food|energy|smithore|crystite) for player (\\w+)')
-def player_state_for_resource(context, resource: str, player: str):
+def calculate_spoilage(context, resource: str, player: str):
     player = context.players[player]
     player.calculate_spoilage(resource)
+
+
+@step('I calculate the spoilage of (food|energy|smithore|crystite) for all players')
+def calculate_spoilage_for_all_players(context, resource: str):
+    for player in context.players:
+        calculate_spoilage(context, resource, player)
 
 
 @step('player (\\w+) should have spoiled (\\d+) unit(?:s)? of (food|energy|smithore|crystite)')
 def player_should_have_spoiled(context, player: str, units: str, resource: str):
     player = context.players[player]
     assert player.resource_states[resource].spoilage == int(units)
+
+
+@step('I calculate the surplus / shortage of (food|energy) for all players')
+def calculate_surplus_for_all_players(context, resource: str):
+    for player in context.players.values():
+        player.calculate_surplus(resource, context.game_context[f"{resource}_needed"])
+
+
+@step("the units of (food|energy) needed for maximum time during development is (\\d+)")
+def step_impl(context, resource, units):
+    try:
+        context.game_context
+    except AttributeError:
+        context.game_context = {}
+    context.game_context[f"{resource}_needed"] = int(units)
+
+
+@step("player (\\w+) should have a (shortage|surplus) of (\\d+) unit(?:s)? of (food|energy)")
+def step_impl(context, player: str, shortage_or_surplus: str, units: str, resource: str):
+    player = context.players[player]
+    actual_surplus = player.resource_states[resource].surplus
+    expected_surplus = int(units)
+    if shortage_or_surplus == "shortage":
+        assert actual_surplus == -expected_surplus
+    else:
+        assert actual_surplus == expected_surplus
