@@ -1,7 +1,9 @@
 from enum import Enum
 import json
+import math
 import os
 import random
+from typing import Dict
 
 
 def to_plot(json_values):
@@ -46,11 +48,32 @@ class PlayerType:
         self.name = name
 
 
+class ResourceState:
+
+    def __init__(self, name: str):
+        self.name = name
+        self.inventory: int = 0
+        self.consumed_in_last_turn: int = 0
+        self.spoilage: int = 0
+
+    def calculate_spoilage(self):
+        if self.name in ["food", "energy"]:
+            self.spoilage = math.floor((self.inventory - self.consumed_in_last_turn) / 2)
+        elif self.name in ["smithore", "crystite"] and self.inventory > 50:
+            self.spoilage = self.inventory - 50
+
+
 class Player:
 
     def __init__(self, name: str, player_type: PlayerType):
         self.name = name
         self.type = player_type
+        self.resource_states: Dict[str: ResourceState] = {}
+
+    def calculate_spoilage(self, resource_name: str):
+        resource_state = self.resource_states[resource_name]
+        if resource_state:
+            resource_state.calculate_spoilage()
 
 
 class Coordinates:

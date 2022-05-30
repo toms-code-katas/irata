@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType
+from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState
 
 use_step_matcher("re")
 
@@ -165,14 +165,20 @@ def player_selects_plot(context, player_name):
 @step('the players have the following state for (food|energy|smithore|crystite)')
 def player_state_for_resource(context, resource: str):
     for row in context.table:
-        pass
+        player = context.players[row["name"]]
+        resource_state = ResourceState(resource)
+        resource_state.inventory = int(row["inventory"])
+        resource_state.consumed_in_last_turn = int(row["consumed in last turn"])
+        player.resource_states[resource] = resource_state
 
 
 @step('I calculate the spoilage of (food|energy|smithore|crystite) for player (\\w+)')
 def player_state_for_resource(context, resource: str, player: str):
-    pass
+    player = context.players[player]
+    player.calculate_spoilage(resource)
 
 
 @step('player (\\w+) should have spoiled (\\d+) unit(?:s)? of (food|energy|smithore|crystite)')
-def player_state_for_resource(context, player: str, units: str, resource: str):
-    pass
+def player_should_have_spoiled(context, player: str, units: str, resource: str):
+    player = context.players[player]
+    assert player.resource_states[resource].spoilage == int(units)

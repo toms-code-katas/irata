@@ -19,7 +19,7 @@ Scenario: Calculate smithore spoilage for players as all units in inventory abov
     | name     | type    |
     | A        | Flapper |
     | B        | Flapper |
-  And the players have the following state for food:
+  And the players have the following state for smithore:
     | name     | inventory | consumed in last turn |
     | A        | 49        | 0                     |
     | B        | 51        | 0                     |
