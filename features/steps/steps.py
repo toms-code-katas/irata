@@ -195,21 +195,17 @@ def player_should_have_spoiled(context, player: str, units: str, resource: str):
 
 @step('I calculate the surplus / shortage of (food|energy) for all players')
 def calculate_surplus_for_all_players(context, resource: str):
-    for player in context.players.values():
-        player.calculate_surplus(resource, context.game_context[f"{resource}_needed"])
-
-
-@step("the units of (food|energy) needed for maximum time during development is (\\d+)")
-def step_impl(context, resource, units):
+    mapp = None
     try:
-        context.game_context
+        mapp = context.map
     except AttributeError:
-        context.game_context = {}
-    context.game_context[f"{resource}_needed"] = int(units)
+        pass
+    for player in context.players.values():
+        player.calculate_surplus(resource, player.calculate_units_needed(resource, mapp))
 
 
 @step("player (\\w+) should have a (shortage|surplus) of (\\d+) unit(?:s)? of (food|energy)")
-def step_impl(context, player: str, shortage_or_surplus: str, units: str, resource: str):
+def player_should_have_surplus(context, player: str, shortage_or_surplus: str, units: str, resource: str):
     player = context.players[player]
     actual_surplus = player.resource_states[resource].surplus
     expected_surplus = int(units)
@@ -217,3 +213,15 @@ def step_impl(context, player: str, shortage_or_surplus: str, units: str, resour
         assert actual_surplus == -expected_surplus
     else:
         assert actual_surplus == expected_surplus
+
+
+@step("the players own the following plots")
+def players_own_plots(context):
+
+    for row in context.table:
+        player = context.players[row["name"]]
+        x = int(row["x"])
+        y = int(row["y"])
+        mapp = context.map
+        plot = mapp.get_plot_at(x, y)
+        plot.owner = player.name

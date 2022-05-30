@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from enum import Enum
 import json
 import math
 import os
 import random
-from typing import Dict
+from typing import Dict, List
 
 
 def to_plot(json_values):
@@ -87,6 +89,14 @@ class Player:
         if resource_state:
             resource_state.calculate_surplus(units_needed)
 
+    def calculate_units_needed(self, resource_name: str, mapp: Map):
+        if resource_name == "food":
+            # TODO: This needs to be depended on the turn of the game
+            return 3
+        elif resource_name == "energy":
+            return len(mapp.get_plots_for_player(self)) + 1
+
+
 class Coordinates:
 
     def __init__(self, x, y):
@@ -163,6 +173,9 @@ class Map:
 
     def get_plot_at(self, x, y):
         return list(filter(lambda plot: plot.coordinates.x == x and plot.coordinates.y == y, self.plots.values()))[0]
+
+    def get_plots_for_player(self, player: Player):
+        return list(filter(lambda plot: plot.owner == player.name, self.plots.values()))
 
 
 class LandGrantState(Enum):
