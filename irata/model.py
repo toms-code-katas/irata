@@ -72,6 +72,28 @@ class ResourceState:
             self.surplus = available_units - units_needed
 
 
+class Stock:
+
+    def __init__(self, resource: str, ask_price: int, bid_price: int, in_stock: int):
+        self.resource = resource
+        self.ask_price = ask_price
+        self.bid_price = bid_price
+        self.in_stock = in_stock
+
+
+class Store:
+
+    def __init__(self):
+        self.stock: Dict[str, Stock] = {}
+        self.players: Dict[str, Player] = {}
+
+    def get_amount_in_stock(self, resource: str) -> int:
+        return self.stock[resource].in_stock
+
+    def add_stock(self, stock: Stock):
+        self.stock[stock.resource] = stock
+
+
 class Player:
 
     def __init__(self, name: str, player_type: PlayerType):
@@ -95,6 +117,39 @@ class Player:
             return 3
         elif resource_name == "energy":
             return len(mapp.get_plots_for_player(self)) + 1
+
+
+class Auction:
+
+    def __init__(self, resource: str, store: Store, players: [Player], game_map: Map):
+        self.resource = resource
+        self.store = store
+        self.game_map = game_map
+        self.players: Dict[str, Player] = {}
+        for player in players:
+            self.add_player(player)
+
+    def add_player(self, player: Player):
+        self.players[player.name] = player
+
+    def start(self):
+        for player in self.players.values():
+            player.calculate_units_needed(self.resource, self.game_map)
+            player.calculate_spoilage(self.resource)
+            player.calculate_surplus(self.resource, player.calculate_units_needed(self.resource, self.game_map))
+
+    def get(self, seller: bool) -> List[Player]:
+        players_in_role = []
+        for player in self.players.values():
+            if self.is_player_seller(player.name) and seller:
+                players_in_role.append(player)
+            else:
+                players_in_role.append(player)
+        return players_in_role
+
+    def is_player_seller(self, player_name: str):
+        player = self.players[player_name]
+        return player.resource_states[self.resource].surplus > 0
 
 
 class Coordinates:

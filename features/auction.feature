@@ -71,3 +71,32 @@ Scenario: Calculate energy surplus / shortage for players which is the number of
   Then player A should have a shortage of 2 units of energy
   Then player B should have a shortage of 0 units of energy
   Then player C should have a surplus of 1 units of energy
+
+Scenario: Energy auction
+  Given I create a default map
+  And I finish map creation
+  And I create the following players
+    | name     | type    |
+    | A        | Flapper |
+    | B        | Flapper |
+    | C        | Flapper |
+  And the players own the following plots
+    | name | x | y |
+    | A    | 1 | 1 |
+    | A    | 2 | 1 |
+    | B    | 1 | 2 |
+    | B    | 2 | 2 |
+    | B    | 3 | 2 |
+  And the players have the following state for energy
+    | name     | previous amount | usage | production |
+    | A        | 2               | 2     | 1          |
+    | B        | 6               | 3     | 3          |
+    | C        | 0               | 0     | 2          |
+  And I create a store with the following inventory
+    | resource | in stock | ask price | bid price |
+    | energy   | 10       | 50        | 25        |
+  And I create an auction for energy
+  When I start the auction
+  Then player A should be a buyer
+  Then player B should be a buyer
+  Then player C should be a seller

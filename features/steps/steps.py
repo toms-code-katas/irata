@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState
+from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState, Stock, Store, Auction
 
 use_step_matcher("re")
 
@@ -225,3 +225,32 @@ def players_own_plots(context):
         mapp = context.map
         plot = mapp.get_plot_at(x, y)
         plot.owner = player.name
+
+
+@step('I create a store with the following inventory')
+def create_store(context):
+    context.store = Store()
+
+    for row in context.table:
+        resource = row["resource"]
+        in_stock = int(row["in stock"])
+        ask_price = int(row["ask price"])
+        bid_price = int(row["bid price"])
+        stock = Stock(resource, in_stock, ask_price, bid_price)
+        context.store.add_stock(stock)
+
+
+@step('I create an auction for (food|energy|smithore|crystite)')
+def create_auction(context, resource: str):
+    context.auction = Auction(resource=resource, store=context.store, players=context.players.values(), game_map=context.map)
+
+
+@step('I start the auction')
+def start_auction(context):
+    context.auction.start()
+
+
+@step('player (\\w+) should be a (buyer|seller)')
+def player_should_be_buyer_or_seller(context, player: str, buyer_or_seller):
+    is_seller = context.auction.is_player_seller(player)
+    assert is_seller and "seller" or (not is_seller and "buyer")
