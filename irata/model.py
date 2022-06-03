@@ -54,21 +54,21 @@ class ResourceState:
 
     def __init__(self, name: str):
         self.name = name
-        self.inventory: int = 0
-        self.consumed_in_last_turn: int = 0
-        self.produced_in_last_turn: int = 0
+        self.previous_amount: int = 0
+        self.usage: int = 0
+        self.production: int = 0
         self.spoilage: int = 0
         self.surplus: int = 0
 
     def calculate_spoilage(self):
         if self.name in ["food", "energy"]:
-            self.spoilage = math.ceil((self.inventory - self.consumed_in_last_turn) / 2)
-        elif self.name in ["smithore", "crystite"] and self.inventory > 50:
-            self.spoilage = self.inventory - 50
+            self.spoilage = math.ceil((self.previous_amount - self.usage) / 2)
+        elif self.name in ["smithore", "crystite"] and self.previous_amount > 50:
+            self.spoilage = self.previous_amount - 50
 
     def calculate_surplus(self, units_needed: int):
         if self.name in ["food", "energy"]:
-            available_units = self.inventory - self.spoilage - self.consumed_in_last_turn + self.produced_in_last_turn
+            available_units = self.previous_amount - self.spoilage - self.usage + self.production
             self.surplus = available_units - units_needed
 
 

@@ -167,11 +167,11 @@ def player_state_for_resource(context, resource: str):
     for row in context.table:
         player = context.players[row["name"]]
         resource_state = ResourceState(resource)
-        resource_state.inventory = int(row["inventory"])
-        if "consumed in last turn" in row.headings:
-            resource_state.consumed_in_last_turn = int(row["consumed in last turn"])
-        if "produced in last turn" in row.headings:
-            resource_state.produced_in_last_turn = int(row["produced in last turn"])
+        resource_state.previous_amount = int(row["previous amount"])
+        if "usage" in row.headings:
+            resource_state.usage = int(row["usage"])
+        if "production" in row.headings:
+            resource_state.production = int(row["production"])
         player.resource_states[resource] = resource_state
 
 
