@@ -91,7 +91,7 @@ Scenario: Energy auction
     | name     | previous amount | usage | production |
     | A        | 2               | 2     | 1          |
     | B        | 6               | 3     | 3          |
-    | C        | 0               | 0     | 2          |
+    | C        | 0               | 0     | 4          |
   And I create a store with the following inventory
     | resource | in stock | ask price | bid price |
     | energy   | 10       | 50        | 25        |
@@ -100,3 +100,14 @@ Scenario: Energy auction
   Then player A should be a buyer
   Then player B should be a buyer
   Then player C should be a seller
+  When player A raises his bid price to 40
+  And player C reduces his ask price to 40
+  Then player A and player C should start trading
+  When player A and player C trade 1 unit
+  And player A reduces his bid price to 39
+  Then player A and player C should stop trading
+  And the players have the following state for energy
+    | name     | current amount  |
+    | A        | 1               |
+    | B        | 3               |
+

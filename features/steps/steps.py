@@ -167,11 +167,14 @@ def player_state_for_resource(context, resource: str):
     for row in context.table:
         player = context.players[row["name"]]
         resource_state = ResourceState(resource)
-        resource_state.previous_amount = int(row["previous amount"])
+        if "previous amount" in row.headings:
+            resource_state.previous_amount = int(row["previous amount"])
         if "usage" in row.headings:
             resource_state.usage = int(row["usage"])
         if "production" in row.headings:
             resource_state.production = int(row["production"])
+        if "current amount" in row.headings:
+            resource_state.current_amount = int(row["current amount"])
         player.resource_states[resource] = resource_state
 
 
@@ -254,3 +257,18 @@ def start_auction(context):
 def player_should_be_buyer_or_seller(context, player: str, buyer_or_seller):
     is_seller = context.auction.is_player_seller(player)
     assert is_seller and "seller" or (not is_seller and "buyer")
+
+
+@step('player (\\w+) (raises|reduces) his (bid|ask) price to (\\d+)')
+def player_adjusts_price(context, player, raises_or_reduces, bid_or_ask, price):
+    pass
+
+
+@step('player (\\w+) and player (\\w+) should (start|stop) trading')
+def players_start_stop_trading(context, first_player, second_player, start_or_stop):
+    pass
+
+
+@step('player (\\w+) and player (\\w+) trade (\\d+) unit(?:s)?')
+def players_trade_units(context, first_player, second_player, units):
+    pass
