@@ -98,10 +98,13 @@ class Store:
 
 class Player:
 
-    def __init__(self, name: str, player_type: PlayerType):
+    def __init__(self, name: str, player_type: PlayerType, money: int = 0):
         self.name = name
         self.type = player_type
         self.resource_states: Dict[str: ResourceState] = {}
+        self.money = money
+        self.ask_price = 0
+        self.bid_price = 0
 
     def calculate_spoilage(self, resource_name: str):
         resource_state = self.resource_states[resource_name]
@@ -121,6 +124,15 @@ class Player:
             return len(mapp.get_plots_for_player(self)) + 1
 
 
+class Trade:
+
+    def __init__(self, buyer:Player, seller:Player, price: int = 0):
+        self.buyer = buyer
+        self.seller = seller
+        self.units_traded: int = 0
+        self.price = price
+
+
 class Auction:
 
     def __init__(self, resource: str, store: Store, players: [Player], game_map: Map):
@@ -130,6 +142,7 @@ class Auction:
         self.players: Dict[str, Player] = {}
         for player in players:
             self.add_player(player)
+        self.current_trade: Trade = None
 
     def add_player(self, player: Player):
         self.players[player.name] = player
@@ -145,13 +158,50 @@ class Auction:
         for player in self.players.values():
             if self.is_player_seller(player.name) and seller:
                 players_in_role.append(player)
-            else:
+            elif not seller:
                 players_in_role.append(player)
         return players_in_role
 
     def is_player_seller(self, player_name: str):
         player = self.players[player_name]
         return player.resource_states[self.resource].surplus > 0
+
+    def player_changes_bid_price(self, player_name: str, new_price: int):
+        self.players[player_name].bid_price = new_price
+        if not self.price_change(new_price):
+            self.current_trade = None
+
+    def player_changes_ask_price(self, player_name: str, new_price: int):
+        self.players[player_name].ask_price = new_price
+        if not self.price_change(new_price):
+            self.current_trade = None
+
+    def price_change(self, new_price) -> bool:
+        buyer, seller = self.can_start_trade()
+        if buyer:
+            self.start_trade(buyer, seller, new_price)
+            return True
+        return False
+
+    def can_start_trade(self):
+        for seller in self.get(True):
+            for buyer in self.get(False):
+                if seller.ask_price == buyer.bid_price and seller.ask_price != 0 and buyer.bid_price != 0:
+                    return buyer, seller
+        return None, None
+
+    def start_trade(self, buyer: Player, seller: Player, price: int):
+        self.current_trade = Trade(buyer, seller, price)
+
+    def stop_current_trade(self) -> bool:
+        self.current_trade = None
+
+    def trade_units(self, units: int):
+        self.current_trade.units_traded += units
+        self.current_trade.buyer.resource_states[self.resource].current_amount -= units
+        self.current_trade.seller.resource_states[self.resource].current_amount += units
+        self.current_trade.buyer.money -= units * self.current_trade.price
+        self.current_trade.seller.money += units * self.current_trade.price
 
 
 class Coordinates:

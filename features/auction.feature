@@ -76,10 +76,10 @@ Scenario: Energy auction
   Given I create a default map
   And I finish map creation
   And I create the following players
-    | name     | type    |
-    | A        | Flapper |
-    | B        | Flapper |
-    | C        | Flapper |
+    | name     | type    | money |
+    | A        | Flapper | 100   |
+    | B        | Flapper | 0     |
+    | C        | Flapper | 100   |
   And the players own the following plots
     | name | x | y |
     | A    | 1 | 1 |
@@ -110,4 +110,5 @@ Scenario: Energy auction
     | name     | current amount  |
     | A        | 1               |
     | B        | 3               |
-
+  And player A should have 60 units of money
+  And player C should have 140 units of money

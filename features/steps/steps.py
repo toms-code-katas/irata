@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState, Stock, Store, Auction
+from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState, Stock, Store, Auction, Trade
 
 use_step_matcher("re")
 
@@ -154,7 +154,10 @@ def create_players(context):
     for row in context.table:
         name = row["name"]
         player_type = row["type"]
-        context.players[name] = Player(name=name, player_type=PlayerType(player_type))
+        money: int = 0
+        if "money" in row.headings:
+            money = int(row["money"])
+        context.players[name] = Player(name=name, player_type=PlayerType(player_type), money=money)
 
 
 @step('player (\\w+) selects the plot')
@@ -261,14 +264,33 @@ def player_should_be_buyer_or_seller(context, player: str, buyer_or_seller):
 
 @step('player (\\w+) (raises|reduces) his (bid|ask) price to (\\d+)')
 def player_adjusts_price(context, player, raises_or_reduces, bid_or_ask, price):
-    pass
+    if bid_or_ask == "bid":
+        context.auction.player_changes_bid_price(player, int(price))
+    elif bid_or_ask == "ask":
+        context.auction.player_changes_ask_price(player, int(price))
 
 
 @step('player (\\w+) and player (\\w+) should (start|stop) trading')
 def players_start_stop_trading(context, first_player, second_player, start_or_stop):
-    pass
+    current_trade: Trade = context.auction.current_trade
+    if start_or_stop == "stop":
+        assert not current_trade
+    else:
+        assert current_trade
+        assert current_trade.buyer.name in [first_player, second_player]
+        assert current_trade.seller.name in [first_player, second_player]
+        current_trade.units_traded = 0
 
 
 @step('player (\\w+) and player (\\w+) trade (\\d+) unit(?:s)?')
 def players_trade_units(context, first_player, second_player, units):
-    pass
+    auction: Auction = context.auction
+    auction.trade_units(int(units))
+
+
+@step('player (\\w+) (should have|has) (\\d+) unit(?:s)? of money')
+def player_has_money(context, player, should_have_or_has, units):
+    player: Player = context.players[player]
+    if should_have_or_has == "should have":
+        assert player.money == int(units)
+
