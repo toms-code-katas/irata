@@ -65,12 +65,12 @@ Scenario: Calculate energy surplus / shortage for players which is the number of
     | name     | previous amount | usage | production |
     | A        | 2               | 2     | 1          |
     | B        | 6               | 3     | 3          |
-    | C        | 0               | 0     | 2          |
+    | C        | 0               | 0     | 4          |
   When I calculate the spoilage of energy for all players
   And I calculate the surplus / shortage of energy for all players
   Then player A should have a shortage of 2 units of energy
   Then player B should have a shortage of 0 units of energy
-  Then player C should have a surplus of 1 units of energy
+  Then player C should have a surplus of 3 units of energy
 
 Scenario: Energy auction
   Given I create a default map
@@ -78,7 +78,7 @@ Scenario: Energy auction
   And I create the following players
     | name     | type    | money |
     | A        | Flapper | 100   |
-    | B        | Flapper | 0     |
+    | B        | Flapper | 1000  |
     | C        | Flapper | 100   |
   And the players own the following plots
     | name | x | y |
@@ -109,6 +109,6 @@ Scenario: Energy auction
   And the players have the following state for energy
     | name     | current amount  |
     | A        | 1               |
-    | B        | 3               |
+    | C        | 3               |
   And player A should have 60 units of money
   And player C should have 140 units of money
