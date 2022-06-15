@@ -294,3 +294,7 @@ def player_has_money(context, player, should_have_or_has, units):
     if should_have_or_has == "should have":
         assert player.money == int(units)
 
+
+@step("player (\\w+)'s ask price should be reset")
+def step_impl(context, player):
+    assert context.players[player].ask_price == 10000

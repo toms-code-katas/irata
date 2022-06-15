@@ -103,7 +103,7 @@ class Player:
         self.type = player_type
         self.resource_states: Dict[str: ResourceState] = {}
         self.money = money
-        self.ask_price = 0
+        self.ask_price = 100000
         self.bid_price = 0
 
     def calculate_spoilage(self, resource_name: str):
@@ -111,10 +111,11 @@ class Player:
         if resource_state:
             resource_state.calculate_spoilage()
 
-    def calculate_surplus(self, resource_name: str, units_needed: int):
+    def calculate_surplus(self, resource_name: str, units_needed: int) -> int:
         resource_state = self.resource_states[resource_name]
         if resource_state:
             resource_state.calculate_surplus(units_needed)
+            return resource_state.surplus
 
     def calculate_units_needed(self, resource_name: str, mapp: Map):
         if resource_name == "food":
@@ -123,10 +124,15 @@ class Player:
         elif resource_name == "energy":
             return len(mapp.get_plots_for_player(self)) + 1
 
+    def is_critical_level_reached(self, resource_name,  mapp: Map):
+        units_needed = self.calculate_units_needed(resource_name, mapp)
+        current_amount = self.resource_states[resource_name].current_amount
+        return units_needed <= current_amount
+
 
 class Trade:
 
-    def __init__(self, buyer:Player, seller:Player, price: int = 0):
+    def __init__(self, buyer:Player, seller: Player, price: int = 0):
         self.buyer = buyer
         self.seller = seller
         self.units_traded: int = 0
@@ -193,15 +199,20 @@ class Auction:
     def start_trade(self, buyer: Player, seller: Player, price: int):
         self.current_trade = Trade(buyer, seller, price)
 
-    def stop_current_trade(self) -> bool:
+    def stop_current_trade(self):
         self.current_trade = None
 
     def trade_units(self, units: int):
+        seller: Player = self.current_trade.seller
+        buyer: Player = self.current_trade.buyer
         self.current_trade.units_traded += units
-        self.current_trade.buyer.resource_states[self.resource].current_amount -= units
-        self.current_trade.seller.resource_states[self.resource].current_amount += units
-        self.current_trade.buyer.money -= units * self.current_trade.price
-        self.current_trade.seller.money += units * self.current_trade.price
+        buyer.resource_states[self.resource].current_amount += units
+        seller.resource_states[self.resource].current_amount -= units
+        buyer.money -= units * self.current_trade.price
+        seller.money += units * self.current_trade.price
+        if seller.is_critical_level_reached(self.resource, self.game_map):
+            self.stop_current_trade()
+            seller.ask_price = 10000
 
 
 class Coordinates:
