@@ -72,7 +72,7 @@ Scenario: Calculate energy surplus / shortage for players which is the number of
   Then player B should have a shortage of 0 units of energy
   Then player C should have a surplus of 3 units of energy
 
-Scenario: Energy auction
+Scenario: Basic energy auction
   Given I create a default map
   And I finish map creation
   And I create the following players
@@ -94,7 +94,7 @@ Scenario: Energy auction
     | C        | 0               | 0     | 4          |
   And I create a store with the following inventory
     | resource | in stock | ask price | bid price |
-    | energy   | 10       | 50        | 25        |
+    | energy   | 10       | 60        | 25        |
   And I create an auction for energy
   When I start the auction
   Then player A should be a buyer
