@@ -207,7 +207,7 @@ def calculate_surplus_for_all_players(context, resource: str):
     except AttributeError:
         pass
     for player in context.players.values():
-        player.calculate_surplus(resource, player.calculate_units_needed(resource, mapp))
+        player.calculate_surplus(resource, mapp)
 
 
 @step("player (\\w+) should have a (shortage|surplus) of (\\d+) unit(?:s)? of (food|energy)")

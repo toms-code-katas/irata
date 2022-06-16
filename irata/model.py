@@ -60,6 +60,7 @@ class ResourceState:
         self.spoilage: int = 0
         self.surplus: int = 0
         self.current_amount: int = 0
+        self.units_needed: int = 0
 
     def calculate_spoilage(self):
         if self.name in ["food", "energy"]:
@@ -68,10 +69,10 @@ class ResourceState:
             self.spoilage = self.previous_amount - 50
         self.current_amount = self.previous_amount - self.spoilage
 
-    def calculate_surplus(self, units_needed: int):
+    def calculate_surplus(self):
         if self.name in ["food", "energy"]:
             self.current_amount = self.current_amount - self.usage + self.production
-            self.surplus = self.current_amount - units_needed
+            self.surplus = self.current_amount - self.units_needed
 
 
 class Stock:
@@ -111,10 +112,11 @@ class Player:
         if resource_state:
             resource_state.calculate_spoilage()
 
-    def calculate_surplus(self, resource_name: str, units_needed: int) -> int:
+    def calculate_surplus(self, resource_name: str, mapp: Map) -> int:
         resource_state = self.resource_states[resource_name]
         if resource_state:
-            resource_state.calculate_surplus(units_needed)
+            resource_state.units_needed = self.calculate_units_needed(resource_name, mapp)
+            resource_state.calculate_surplus()
             return resource_state.surplus
 
     def calculate_units_needed(self, resource_name: str, mapp: Map):
@@ -124,10 +126,9 @@ class Player:
         elif resource_name == "energy":
             return len(mapp.get_plots_for_player(self)) + 1
 
-    def is_critical_level_reached(self, resource_name,  mapp: Map):
-        units_needed = self.calculate_units_needed(resource_name, mapp)
+    def is_critical_level_reached(self, resource_name: str):
         current_amount = self.resource_states[resource_name].current_amount
-        return units_needed <= current_amount
+        return self.resource_states[resource_name].units_needed <= current_amount
 
 
 class Trade:
@@ -157,7 +158,7 @@ class Auction:
         for player in self.players.values():
             player.calculate_units_needed(self.resource, self.game_map)
             player.calculate_spoilage(self.resource)
-            player.calculate_surplus(self.resource, player.calculate_units_needed(self.resource, self.game_map))
+            player.calculate_surplus(self.resource, self.game_map)
 
     def get(self, seller: bool) -> List[Player]:
         players_in_role = []
@@ -210,7 +211,7 @@ class Auction:
         seller.resource_states[self.resource].current_amount -= units
         buyer.money -= units * self.current_trade.price
         seller.money += units * self.current_trade.price
-        if seller.is_critical_level_reached(self.resource, self.game_map):
+        if seller.is_critical_level_reached(self.resource):
             self.stop_current_trade()
             seller.ask_price = 10000
 
