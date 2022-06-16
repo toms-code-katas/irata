@@ -68,11 +68,13 @@ class ResourceState:
         elif self.name in ["smithore", "crystite"] and self.previous_amount > 50:
             self.spoilage = self.previous_amount - 50
         self.current_amount = self.previous_amount - self.spoilage
+        return self.spoilage
 
     def calculate_surplus(self):
         if self.name in ["food", "energy"]:
             self.current_amount = self.current_amount - self.usage + self.production
             self.surplus = self.current_amount - self.units_needed
+        return self.surplus
 
 
 class Stock:
@@ -110,14 +112,13 @@ class Player:
     def calculate_spoilage(self, resource_name: str):
         resource_state = self.resource_states[resource_name]
         if resource_state:
-            resource_state.calculate_spoilage()
+            return resource_state.calculate_spoilage()
 
     def calculate_surplus(self, resource_name: str, mapp: Map) -> int:
         resource_state = self.resource_states[resource_name]
         if resource_state:
             resource_state.units_needed = self.calculate_units_needed(resource_name, mapp)
-            resource_state.calculate_surplus()
-            return resource_state.surplus
+            return resource_state.calculate_surplus()
 
     def calculate_units_needed(self, resource_name: str, mapp: Map):
         if resource_name == "food":
