@@ -70,6 +70,7 @@ Scenario: Energy auction with seller inactive after running dry
   And player A and player C trade 1 units
   Then player A and player C should stop trading
   And player C's ask price should be reset
+  And player C should not be able to trade as a seller
   And the players should have the following state for energy
     | name     | current amount  |
     | A        | 5               |

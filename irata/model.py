@@ -185,6 +185,9 @@ class Auction:
             self.current_trade = None
 
     def player_changes_ask_price(self, player_name: str, new_price: int):
+        player = self.players[player_name]
+        if player.resource_states[self.resource].current_amount == 0:
+            raise Exception("Seller has run dry")
         self.players[player_name].ask_price = new_price
         if not self.price_change(new_price):
             self.current_trade = None

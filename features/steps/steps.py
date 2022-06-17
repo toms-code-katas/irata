@@ -311,3 +311,21 @@ def player_has_money(context, player, should_have_or_has, units):
 @step("player (\\w+)'s ask price should be reset")
 def step_impl(context, player):
     assert context.players[player].ask_price == 10000
+
+
+@step("player (\\w+) should not be able to trade as a (seller|buyer)")
+def step_impl(context, player: str, seller_or_buyer: str):
+    exception = None
+    if seller_or_buyer == "seller":
+        try:
+            context.auction.player_changes_ask_price(player, 10)
+        except Exception as e:
+            assert str(e) == "Seller has run dry"
+            exception = e
+    else:
+        try:
+            context.auction.player_changes_bid_price(player, 10)
+        except Exception as e:
+            assert str(e) == "Insufficient funds"
+            exception = e
+    assert exception
