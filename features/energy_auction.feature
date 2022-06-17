@@ -23,8 +23,9 @@ Background:
   And I create a store with the following inventory
     | resource | in stock | ask price | bid price |
     | energy   | 10       | 60        | 25        |
+  When I calculate the spoilage of energy for all players
   And I calculate the surplus / shortage of energy for all players
-  And I create an auction for energy
+  When I create an auction for energy
 
 Scenario: Basic energy auction
   When I start the auction

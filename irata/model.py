@@ -61,6 +61,7 @@ class ResourceState:
         self.surplus: int = 0
         self.current_amount: int = 0
         self.units_needed: int = 0
+        self.production_applied: bool = False
 
     def calculate_spoilage(self):
         if self.name in ["food", "energy"]:
@@ -71,6 +72,7 @@ class ResourceState:
         return self.spoilage
 
     def calculate_surplus(self):
+        self.calculate_spoilage()
         if self.name in ["food", "energy"]:
             self.current_amount = self.current_amount - self.usage + self.production
             self.surplus = self.current_amount - self.units_needed
