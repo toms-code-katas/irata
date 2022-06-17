@@ -133,6 +133,9 @@ class Player:
         current_amount = self.resource_states[resource_name].current_amount
         return self.resource_states[resource_name].units_needed <= current_amount
 
+    def has_run_dry(self, resource_name:str) -> bool:
+        return self.resource_states[resource_name].current_amount <= 0
+
 
 class Trade:
 
@@ -214,7 +217,7 @@ class Auction:
         seller.resource_states[self.resource].current_amount -= units
         buyer.money -= units * self.current_trade.price
         seller.money += units * self.current_trade.price
-        if seller.is_critical_level_reached(self.resource):
+        if seller.is_critical_level_reached(self.resource) or seller.has_run_dry(self.resource):
             self.stop_current_trade()
             seller.ask_price = 10000
 

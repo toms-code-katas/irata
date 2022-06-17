@@ -165,20 +165,33 @@ def player_selects_plot(context, player_name):
     context.land_grant.select_current_plot(context.players[player_name])
 
 
-@step('the players have the following state for (food|energy|smithore|crystite)')
-def player_state_for_resource(context, resource: str):
-    for row in context.table:
-        player = context.players[row["name"]]
-        resource_state = ResourceState(resource)
-        if "previous amount" in row.headings:
-            resource_state.previous_amount = int(row["previous amount"])
-        if "usage" in row.headings:
-            resource_state.usage = int(row["usage"])
-        if "production" in row.headings:
-            resource_state.production = int(row["production"])
-        if "current amount" in row.headings:
-            resource_state.current_amount = int(row["current amount"])
-        player.resource_states[resource] = resource_state
+@step('the players (|should )have the following state for (food|energy|smithore|crystite)')
+def player_state_for_resource(context, should_or_have, resource: str):
+    if not should_or_have:
+        for row in context.table:
+            player = context.players[row["name"]]
+            resource_state = ResourceState(resource)
+            if "previous amount" in row.headings:
+                resource_state.previous_amount = int(row["previous amount"])
+            if "usage" in row.headings:
+                resource_state.usage = int(row["usage"])
+            if "production" in row.headings:
+                resource_state.production = int(row["production"])
+            if "current amount" in row.headings:
+                resource_state.current_amount = int(row["current amount"])
+            player.resource_states[resource] = resource_state
+    else:
+        for row in context.table:
+            player = context.players[row["name"]]
+            resource_state = player.resource_states[resource]
+            if "previous amount" in row.headings:
+                assert resource_state.previous_amount == int(row["previous amount"])
+            if "usage" in row.headings:
+                assert resource_state.usage == int(row["usage"])
+            if "production" in row.headings:
+                assert resource_state.production == int(row["production"])
+            if "current amount" in row.headings:
+                assert resource_state.current_amount == int(row["current amount"])
 
 
 @step('I calculate the spoilage of (food|energy|smithore|crystite) for player (\\w+)')

@@ -26,39 +26,51 @@ Background:
   When I calculate the spoilage of energy for all players
   And I calculate the surplus / shortage of energy for all players
   When I create an auction for energy
-
-Scenario: Basic energy auction
-  When I start the auction
+  And I start the auction
   Then player A should be a buyer
   Then player B should be a buyer
   Then player C should be a seller
+
+Scenario: Basic energy auction
   When player A raises his bid price to 40
   And player C reduces his ask price to 40
   Then player A and player C should start trading
   When player A and player C trade 1 unit
   And player A reduces his bid price to 39
   Then player A and player C should stop trading
-  And the players have the following state for energy
+  And the players should have the following state for energy
     | name     | current amount  |
-    | A        | 1               |
+    | A        | 2               |
     | C        | 3               |
   And player A should have 960 units of money
   And player C should have 140 units of money
 
 Scenario: Energy auction with seller reset after reaching critical level
-  When I start the auction
-  Then player A should be a buyer
-  Then player B should be a buyer
-  Then player C should be a seller
   When player A raises his bid price to 40
   And player C reduces his ask price to 40
   Then player A and player C should start trading
   When player A and player C trade 3 units
   Then player A and player C should stop trading
   And player C's ask price should be reset
-  And the players have the following state for energy
+  And the players should have the following state for energy
     | name     | current amount  |
     | A        | 4               |
-    | C        | 0               |
+    | C        | 1               |
   And player A should have 880 units of money
   And player C should have 220 units of money
+
+Scenario: Energy auction with seller inactive after running dry
+  When player A raises his bid price to 40
+  And player C reduces his ask price to 40
+  Then player A and player C should start trading
+  When player A and player C trade 3 units
+  Then player A and player C should stop trading
+  And player C's ask price should be reset
+  When player C reduces his ask price to 40
+  And player A and player C trade 1 units
+  Then player A and player C should stop trading
+  And player C's ask price should be reset
+  And the players should have the following state for energy
+    | name     | current amount  |
+    | A        | 5               |
+    | C        | 0               |

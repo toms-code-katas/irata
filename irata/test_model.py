@@ -25,6 +25,10 @@ class TestPlayer(TestCase):
         self.assertEquals(5, player.calculate_spoilage(resource), "Spoilage should be half of the units left "
                                                                   "from the previous turn")
 
+        energy.previous_amount = 2
+        self.assertEquals(1, player.calculate_spoilage(resource), "Spoilage should be half of the units left "
+                                                                  "from the previous turn")
+
     def test_calculate_energy_surplus(self):
         resource = "energy"
         player = Player(name="test-1", player_type=PlayerType("Flapper"), money=100)
