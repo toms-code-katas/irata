@@ -308,12 +308,16 @@ def player_has_money(context, player, should_have_or_has, units):
         assert player.money == int(units)
 
 
-@step("player (\\w+)'s (ask|bid) price should be reset")
-def ask_price_should_be_reset(context, player, bid_or_ask: str):
-    if bid_or_ask == "ask":
+@step("player (\\w+)'s (ask|bid) price should be (reset|(\\d+))")
+def ask_price_should_be_reset(context, player, bid_or_ask: str, reset_or_price, price):
+    if bid_or_ask == "ask" and reset_or_price == "reset":
         assert context.players[player].ask_price == 10000
-    else:
+    elif bid_or_ask == "ask":
+        assert context.players[player].ask_price == int(reset_or_price)
+    elif bid_or_ask == "bid" and reset_or_price == "reset":
         assert context.players[player].bid_price == -10000
+    elif bid_or_ask == "bdi":
+        assert context.players[player].bid_price == int(reset_or_price)
 
 
 @step("player (\\w+) should not be able to (raise|reduce) his (bid|ask) price to (\\d+)")

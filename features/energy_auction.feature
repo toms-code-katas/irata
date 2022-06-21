@@ -77,6 +77,7 @@ Scenario: Energy auction with seller inactive after running dry
 
 Scenario: Energy auction with buyer being reset because of being strapped for cash
   Then player B should not be able to raise his bid price to 41
+  And player B's bid price should be 40
   When player C reduces his ask price to 30
   And player B raises his bid price to 30
   Then player C and player B should start trading
