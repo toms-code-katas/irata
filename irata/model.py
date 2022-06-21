@@ -131,7 +131,7 @@ class Player:
 
     def is_critical_level_reached(self, resource_name: str):
         current_amount = self.resource_states[resource_name].current_amount
-        return self.resource_states[resource_name].units_needed <= current_amount
+        return self.resource_states[resource_name].units_needed >= current_amount
 
     def has_run_dry(self, resource_name:str) -> bool:
         return self.resource_states[resource_name].current_amount <= 0
@@ -180,6 +180,9 @@ class Auction:
         return player.resource_states[self.resource].surplus > 0
 
     def player_changes_bid_price(self, player_name: str, new_price: int):
+        player = self.players[player_name]
+        if player.money < new_price:
+            raise Exception("Insufficient funds")
         self.players[player_name].bid_price = new_price
         if not self.price_change(new_price):
             self.current_trade = None
@@ -223,6 +226,9 @@ class Auction:
         if seller.is_critical_level_reached(self.resource) or seller.has_run_dry(self.resource):
             self.stop_current_trade()
             seller.ask_price = 10000
+        elif buyer.money < self.current_trade.price:
+            self.stop_current_trade()
+            buyer.bid_price = -10000
 
 
 class Coordinates:

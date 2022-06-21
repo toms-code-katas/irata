@@ -308,24 +308,27 @@ def player_has_money(context, player, should_have_or_has, units):
         assert player.money == int(units)
 
 
-@step("player (\\w+)'s ask price should be reset")
-def step_impl(context, player):
-    assert context.players[player].ask_price == 10000
+@step("player (\\w+)'s (ask|bid) price should be reset")
+def ask_price_should_be_reset(context, player, bid_or_ask: str):
+    if bid_or_ask == "ask":
+        assert context.players[player].ask_price == 10000
+    else:
+        assert context.players[player].bid_price == -10000
 
 
-@step("player (\\w+) should not be able to trade as a (seller|buyer)")
-def step_impl(context, player: str, seller_or_buyer: str):
+@step("player (\\w+) should not be able to (raise|reduce) his (bid|ask) price to (\\d+)")
+def should_not_be_able_to_raise_or_reduce(context, player: str, raise_or_reduce: str, bid_or_ask: str, price):
     exception = None
-    if seller_or_buyer == "seller":
+    if bid_or_ask == "bid":
         try:
-            context.auction.player_changes_ask_price(player, 10)
+            context.auction.player_changes_bid_price(player, int(price))
         except Exception as e:
-            assert str(e) == "Seller has run dry"
+            assert str(e) == "Insufficient funds"
             exception = e
     else:
         try:
-            context.auction.player_changes_bid_price(player, 10)
+            context.auction.player_changes_ask_price(player, int(price))
         except Exception as e:
-            assert str(e) == "Insufficient funds"
+            assert str(e) == "Seller has run dry"
             exception = e
     assert exception

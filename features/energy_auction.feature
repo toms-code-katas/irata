@@ -6,7 +6,7 @@ Background:
   And I create the following players
     | name     | type    | money |
     | A        | Flapper | 1000  |
-    | B        | Flapper | 1000  |
+    | B        | Flapper | 40    |
     | C        | Flapper | 100   |
   And the players own the following plots
     | name | x | y |
@@ -69,9 +69,17 @@ Scenario: Energy auction with seller inactive after running dry
   When player C reduces his ask price to 40
   And player A and player C trade 1 units
   Then player A and player C should stop trading
-  And player C's ask price should be reset
-  And player C should not be able to trade as a seller
+  And player C should not be able to reduce his ask price to 60
   And the players should have the following state for energy
     | name     | current amount  |
     | A        | 5               |
     | C        | 0               |
+
+Scenario: Energy auction with buyer stuck at bid price because of having insufficient funds
+  Then player B should not be able to raise his bid price to 41
+  When player C reduces his ask price to 30
+  And player B raises his bid price to 30
+  Then player C and player B should start trading
+  When player C and player B trade 1 unit
+  Then player C and player B should stop trading
+  And player B's bid price should be reset
