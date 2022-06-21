@@ -182,7 +182,7 @@ class Auction:
     def player_changes_bid_price(self, player_name: str, new_price: int):
         player = self.players[player_name]
         if player.money < new_price:
-            raise Exception("Insufficient funds")
+            raise Exception("Buyer's strapped for cash")
         self.players[player_name].bid_price = new_price
         if not self.price_change(new_price):
             self.current_trade = None

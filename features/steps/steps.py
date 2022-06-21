@@ -323,7 +323,7 @@ def should_not_be_able_to_raise_or_reduce(context, player: str, raise_or_reduce:
         try:
             context.auction.player_changes_bid_price(player, int(price))
         except Exception as e:
-            assert str(e) == "Insufficient funds"
+            assert str(e) == "Buyer's strapped for cash"
             exception = e
     else:
         try:
