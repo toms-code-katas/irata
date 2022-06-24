@@ -84,3 +84,11 @@ Scenario: Energy auction with buyer being reset because of being strapped for ca
   When player C and player B trade 1 unit
   Then player C and player B should stop trading
   And player B's bid price should be reset
+
+Scenario: Energy auction with buyer not being able to raise bid more than money owned
+  When player B should not be able to raise his bid price to 41
+  Then player B's bid price should be 40
+  When player B should not be able to raise his bid price to 41
+  Then player B's bid price should be 40
+
+Scenario: Energy auction buyer buying from store
