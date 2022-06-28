@@ -1,5 +1,5 @@
 from behave import step, use_step_matcher
-from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState, Stock, Store, Auction, Trade
+from irata.model import Map, PlotType, Plot, LandGrant, Player, PlayerType, ResourceState, Store, Auction, Trade
 
 use_step_matcher("re")
 
@@ -248,15 +248,19 @@ def players_own_plots(context):
 
 @step('I create a store with the following inventory')
 def create_store(context):
-    context.store = Store()
+    context.store = Store("Store", PlayerType("Store"))
+    context.players["Store"] = context.store
 
     for row in context.table:
         resource = row["resource"]
         in_stock = int(row["in stock"])
         ask_price = int(row["ask price"])
         bid_price = int(row["bid price"])
-        stock = Stock(resource, in_stock, ask_price, bid_price)
-        context.store.add_stock(stock)
+        r = ResourceState(resource)
+        r.current_amount = in_stock
+        r.bid_price = bid_price
+        r.ask_price = ask_price
+        context.store.resource_states[resource] = r
 
 
 @step('I create an auction for (food|energy|smithore|crystite)')
@@ -283,20 +287,22 @@ def player_adjusts_price(context, player, raises_or_reduces, bid_or_ask, price):
         context.auction.player_changes_ask_price(player, int(price))
 
 
-@step('player (\\w+) and player (\\w+) should (start|stop) trading')
-def players_start_stop_trading(context, first_player, second_player, start_or_stop):
+@step('player (\\w+) and (player (\\w+)|the store) should (start|stop) trading')
+def players_or_store_start_stop_trading(context, first_player, second_player_or_store, player_name, start_or_stop):
+    if second_player_or_store == "the store":
+        player_name = "Store"
     current_trade: Trade = context.auction.current_trade
     if start_or_stop == "stop":
         assert not current_trade
     else:
         assert current_trade
-        assert current_trade.buyer.name in [first_player, second_player]
-        assert current_trade.seller.name in [first_player, second_player]
+        assert current_trade.buyer.name in [first_player, player_name]
+        assert current_trade.seller.name in [first_player, player_name]
         current_trade.units_traded = 0
 
 
-@step('player (\\w+) and player (\\w+) trade (\\d+) unit(?:s)?')
-def players_trade_units(context, first_player, second_player, units):
+@step('player (\\w+) and (player (\\w+)|the store) trade (\\d+) unit(?:s)?')
+def players_trade_units(context, first_player, second_player_or_store, player_name, units):
     auction: Auction = context.auction
     auction.trade_units(int(units))
 

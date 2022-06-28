@@ -92,3 +92,12 @@ Scenario: Energy auction with buyer not being able to raise bid more than money 
   Then player B's bid price should be 40
 
 Scenario: Energy auction buyer buying from store
+  When player A raises his bid price to 60
+  Then player A and the store should start trading
+  When player A and the store trade 1 unit
+  And player A reduces his bid price to 59
+  Then player A and the store should stop trading
+  And the players should have the following state for energy
+    | name     | current amount  |
+    | A        | 2               |
+    | Store    | 9               |

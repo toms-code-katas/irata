@@ -62,6 +62,8 @@ class ResourceState:
         self.current_amount: int = 0
         self.units_needed: int = 0
         self.production_applied: bool = False
+        self.ask_price = 100000
+        self.bid_price = 0
 
     def calculate_spoilage(self):
         if self.name in ["food", "energy"]:
@@ -79,26 +81,13 @@ class ResourceState:
         return self.surplus
 
 
-class Stock:
-
-    def __init__(self, resource: str, ask_price: int, bid_price: int, in_stock: int):
-        self.resource = resource
-        self.ask_price = ask_price
-        self.bid_price = bid_price
-        self.in_stock = in_stock
-
-
-class Store:
-
-    def __init__(self):
-        self.stock: Dict[str, Stock] = {}
-        self.players: Dict[str, Player] = {}
-
-    def get_amount_in_stock(self, resource: str) -> int:
-        return self.stock[resource].in_stock
-
-    def add_stock(self, stock: Stock):
-        self.stock[stock.resource] = stock
+# class Stock:
+#
+#     def __init__(self, resource: str, ask_price: int, bid_price: int, in_stock: int):
+#         self.resource = resource
+#         self.ask_price = ask_price
+#         self.bid_price = bid_price
+#         self.in_stock = in_stock
 
 
 class Player:
@@ -108,8 +97,6 @@ class Player:
         self.type = player_type
         self.resource_states: Dict[str: ResourceState] = {}
         self.money = money
-        self.ask_price = 100000
-        self.bid_price = 0
 
     def calculate_spoilage(self, resource_name: str):
         resource_state = self.resource_states[resource_name]
@@ -137,6 +124,29 @@ class Player:
         return self.resource_states[resource_name].current_amount <= 0
 
 
+class Store(Player):
+
+    def __init__(self, name: str, player_type: PlayerType = PlayerType("Store"), money: int = 10000000):
+        super().__init__(name, player_type, money)
+
+    def calculate_spoilage(self, resource_name: str):
+        return 0
+
+    def calculate_surplus(self, resource_name: str, mapp: Map) -> int:
+        self.resource_states[resource_name].production_applied = True
+        self.resource_states[resource_name].surplus = self.resource_states[resource_name].current_amount
+        return self.resource_states[resource_name].surplus
+
+    def calculate_units_needed(self, resource_name: str, mapp: Map):
+        return 0
+
+    def is_critical_level_reached(self, resource_name: str):
+        return False
+
+    def has_run_dry(self, resource_name:str) -> bool:
+        return self.resource_states[resource_name].current_amount <= 0
+
+
 class Trade:
 
     def __init__(self, buyer:Player, seller: Player, price: int = 0):
@@ -155,6 +165,7 @@ class Auction:
         self.players: Dict[str, Player] = {}
         for player in players:
             self.add_player(player)
+        self.add_player(store)
         self.current_trade: Trade = None
 
     def add_player(self, player: Player):
@@ -183,7 +194,7 @@ class Auction:
         player = self.players[player_name]
         if player.money < new_price:
             raise Exception("Buyer's strapped for cash")
-        self.players[player_name].bid_price = new_price
+        self.players[player_name].resource_states[self.resource].bid_price = new_price
         if not self.price_change(new_price):
             self.current_trade = None
 
@@ -191,7 +202,7 @@ class Auction:
         player = self.players[player_name]
         if player.resource_states[self.resource].current_amount == 0:
             raise Exception("Seller has run dry")
-        self.players[player_name].ask_price = new_price
+        self.players[player_name].resource_states[self.resource].ask_price = new_price
         if not self.price_change(new_price):
             self.current_trade = None
 
@@ -205,7 +216,9 @@ class Auction:
     def can_start_trade(self):
         for seller in self.get(True):
             for buyer in self.get(False):
-                if seller.ask_price == buyer.bid_price and seller.ask_price != 0 and buyer.bid_price != 0:
+                ask_price = seller.resource_states[self.resource].ask_price
+                bid_price = buyer.resource_states[self.resource].bid_price
+                if ask_price == bid_price and ask_price != 0 and bid_price != 0:
                     return buyer, seller
         return None, None
 
