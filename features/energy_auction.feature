@@ -110,3 +110,11 @@ Scenario: Energy auction buyer buying from store until store has run dry
   And the store should have run dry on energy
   When player A raises his bid price to 70
   Then player A and the store should not be trading
+
+# Scenario: Store has run dry => Can somebody still sell to the store ?
+# That would mean that the store would reappear as a seller at the top
+# Scenario steps:
+# - At least one seller
+# - A buyer buys from the store until it runs dry
+# - Buyer goes back
+# - Seller tries to sell to the store
