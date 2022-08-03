@@ -287,12 +287,12 @@ def player_adjusts_price(context, player, raises_or_reduces, bid_or_ask, price):
         context.auction.player_changes_ask_price(player, int(price))
 
 
-@step('player (\\w+) and (player (\\w+)|the store) should (start|stop) trading')
+@step('player (\\w+) and (player (\\w+)|the store) should (start|stop|not be) trading')
 def players_or_store_start_stop_trading(context, first_player, second_player_or_store, player_name, start_or_stop):
     if second_player_or_store == "the store":
         player_name = "Store"
     current_trade: Trade = context.auction.current_trade
-    if start_or_stop == "stop":
+    if start_or_stop in ["stop", "not be"]:
         assert not current_trade
     else:
         assert current_trade
@@ -342,3 +342,11 @@ def should_not_be_able_to_raise_or_reduce(context, player: str, raise_or_reduce:
             assert str(e) == "Seller has run dry"
             exception = e
     assert exception
+
+
+@step('(\\w+|the store) (should have|has) run dry on (food|energy)')
+def player_should_have_run_dry(context, player, should_have_or_has, resource):
+    if player == "the store":
+        player_name = "Store"
+    player: Player = context.players[player_name]
+    assert player.resource_states[resource].current_amount == 0

@@ -101,3 +101,12 @@ Scenario: Energy auction buyer buying from store
     | name     | current amount  |
     | A        | 2               |
     | Store    | 9               |
+
+Scenario: Energy auction buyer buying from store until store has run dry
+  When player A raises his bid price to 60
+  Then player A and the store should start trading
+  When player A and the store trade 10 units
+  Then player A and the store should stop trading
+  And the store should have run dry on energy
+  When player A raises his bid price to 70
+  Then player A and the store should not be trading
